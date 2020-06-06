@@ -83,3 +83,51 @@ while True:
                     # the centroid pairs
                     violate.add(i)
                     violate.add(j)
+
+    # loop over the results
+    for (i, (prob, bbox, centroid)) in enumerate(results):
+        # extract the bounding box and centroid coordinates, then
+        # initialize the color of the annotation
+        (startX, startY, endX, endY) = bbox
+        (cX, cY) = centroid
+        color = (0, 255, 0)
+
+        # if the index pair exists within the violation set, then
+        # update the color
+        if i in violate:
+            color = (0, 0, 255)
+
+        # draw (1) a bounding box around the person and (2) the
+        # centroid coordinates of the person,
+        cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+        cv2.circle(frame, (cX, cY), 5, color, 1)
+
+    # draw the total number of social distancing violations on the
+    # output frame
+    text = "Social Distancing Violations: {}".format(len(violate))
+    cv2.putText(frame, text, (10, frame.shape[0] - 25),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3)
+
+    # check to see if the output frame should be displayed to our
+    # screen
+    if args["display"] > 0:
+        # show the output frame
+        cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1) & 0xFF
+
+        # if the `q` key was pressed, break from the loop
+        if key == ord("q"):
+            break
+
+    # if an output video file path has been supplied and the video
+    # writer has not been initialized, do so now
+    if args["output"] != "" and writer is None:
+        # initialize our video writer
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        writer = cv2.VideoWriter(args["output"], fourcc, 25,
+                                 (frame.shape[1], frame.shape[0]), True)
+
+    # if the video writer is not None, write the frame to the output
+    # video file
+    if writer is not None:
+        writer.write(frame)

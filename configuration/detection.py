@@ -30,13 +30,13 @@ def detect_people(frame, net, ln, person_index=0):
             # extract the class ID and confidence (i.e., probability)
             # of the current object detection
             scores = detection[5:]
-            classID = np.argmax(scores)
-            confidence = scores[classID]
+            class_id = np.argmax(scores)
+            confidence = scores[class_id]
 
             # filter detections by (1) ensuring that the object
             # detected was a person and (2) that the minimum
             # confidence is met
-            if classID == person_index and confidence > MIN_CONF:
+            if class_id == person_index and confidence > MIN_CONF:
                 # scale the bounding box coordinates back relative to
                 # the size of the image, keeping in mind that YOLO
                 # actually returns the center (x, y)-coordinates of
